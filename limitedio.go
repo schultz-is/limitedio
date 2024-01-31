@@ -15,8 +15,8 @@ type LimitedWriter struct {
 func LimitWriter(w io.Writer, n int64) io.Writer { return &LimitedWriter{w, n} }
 
 // Write sends the provided bytes to the underlying [io.Writer], limiting the output to the
-// remaining bytes. When there are no bytes remaining in the limit, an EOF is returned. Any EOF
-// from the underlying writer will return an EOF.
+// remaining bytes. When there are no bytes remaining in the limit, an EOF is returned. Any error
+// from the underlying writer will be returned.
 func (l *LimitedWriter) Write(p []byte) (n int, err error) {
 	if l.N <= 0 {
 		return 0, io.EOF
@@ -43,7 +43,7 @@ func CallLimitReader(r io.Reader, n int64) io.Reader { return &CallLimitedReader
 
 // Read receives bytes from the underlying [io.Reader], limiting the output based on the number of
 // remaining calls allowed to Read. When there are no more Read calls remaining in the limit, an
-// EOF is returned. Any EOF from the underlying reader will return an EOF.
+// EOF is returned. Any error from the underlying reader will be returned.
 func (l *CallLimitedReader) Read(p []byte) (n int, err error) {
 	if l.N <= 0 {
 		return 0, io.EOF
@@ -67,7 +67,7 @@ func CallLimitWriter(w io.Writer, n int64) io.Writer { return &CallLimitedWriter
 
 // Write sends the provided bytes to the underlying [io.Writer], limiting the output based on the
 // number of remaining calls allowed to Write. When there are no more Write calls remaining in the
-// limit, an EOF is returned. Any EOF from the underlying writer will return an EOF.
+// limit, an EOF is returned. Any error from the underlying writer will be returned.
 func (l *CallLimitedWriter) Write(p []byte) (n int, err error) {
 	if l.N <= 0 {
 		return 0, io.EOF
