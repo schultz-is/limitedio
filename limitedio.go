@@ -11,12 +11,11 @@ type LimitedWriter struct {
 }
 
 // Write sends the provided bytes to the underlying [io.Writer], limiting the output to the
-// remaining bytes. When there are no bytes remaining in the limit, an EOF is returned. If there
-// are insufficient bytes remaining to write the provided bytes in their entirety, only N bytes
-// will be written and an EOF will be returned.
+// remaining bytes. When there are no bytes remaining in the limit, an EOF is returned. Any EOF
+// from the underlying writer will return an EOF.
 func (l *LimitedWriter) Write(p []byte) (n int, err error) {
 	if l.N <= 0 {
-		return 0, EOF
+		return 0, io.EOF
 	}
 	if int64(len(p)) > l.N {
 		p = p[0:l.N]
