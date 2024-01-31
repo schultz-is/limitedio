@@ -12,7 +12,7 @@ type LimitedWriter struct {
 
 // LimitWriter returns a Writer that writes to w but stops with EOF after n bytes. The underlying
 // implementation is a *LimitedWriter.
-func LimitWriter(w io.Writer, n int64) io.Writer { return &LimitedWriter{r, n} }
+func LimitWriter(w io.Writer, n int64) io.Writer { return &LimitedWriter{w, n} }
 
 // Write sends the provided bytes to the underlying [io.Writer], limiting the output to the
 // remaining bytes. When there are no bytes remaining in the limit, an EOF is returned. Any EOF
