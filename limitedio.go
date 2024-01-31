@@ -52,3 +52,27 @@ func (l *CallLimitedReader) Read(p []byte) (n int, err error) {
 	l.N -= 1
 	return
 }
+
+// A CallLimitedWriter writes to W but limits the number of calls to Write to N. Each call to Write
+// updates N to reflect the new call count remaining. Write returns an EOF when N <= 0 or when the
+// underlying W returns EOF.
+type CallLimitedWriter struct {
+	W io.Writer // W is the underlying io.Writer.
+	N int64     // N is the maximum number of calls remaining.
+}
+
+// CallLimitWriter returns a Writer that writes to w but stops with EOF after n calls to Write. The
+// underlying implementation is a *CallLimitedWriter.
+func CallLimitWriter(w io.Writer, n int64) io.Writer { return &CallLimitedWriter{w, n} }
+
+// Write sends the provided bytes to the underlying [io.Writer], limiting the output based on the
+// number of remaining calls allowed to Write. When there are no more Write calls remaining in the
+// limit, an EOF is returned. Any EOF from the underlying writer will return an EOF.
+func (l *CallLimitedWriter) Write(p []byte) (n int, err error) {
+	if l.N <= 0 {
+		return 0, io.EOF
+	}
+	n, err = l.W.Write(p)
+	l.N -= 1
+	return
+}

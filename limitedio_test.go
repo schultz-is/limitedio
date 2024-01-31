@@ -112,3 +112,47 @@ func TestCallLimitedReader(t *testing.T) {
 		t.Fatalf("Read on CallLimitedReader incorrectly updated N; got %d, expected %d", limit-1, lr.N)
 	}
 }
+
+func TestCallLimitedWriter(t *testing.T) {
+	// Calling Write with a negative value for N should result in zero bytes written and an EOF.
+	var buf bytes.Buffer
+	w := CallLimitWriter(&buf, -1)
+	n, err := w.Write([]byte("howdy"))
+	if n != 0 {
+		t.Fatalf("Write on CallLimitedWriter with N<0 wrote %d bytes; expected 0", n)
+	}
+	if err != io.EOF {
+		t.Fatalf("Write on CallLimitedWriter with N<0 did not return EOF: %s", err)
+	}
+
+	// Calling Write with a zero value for N should result in zero bytes written and an EOF.
+	buf.Reset()
+	w = CallLimitWriter(&buf, 0)
+	n, err = w.Write([]byte("howdy"))
+	if n != 0 {
+		t.Fatalf("Write on CallLimitedWriter with N=0 wrote %d bytes; expected 0", n)
+	}
+	if err != io.EOF {
+		t.Fatalf("Write on CallLimitedWriter with N=0 did not return EOF: %s", err)
+	}
+
+	// Errors from the underlying writer should propagate up.
+	buf.Reset()
+	w = CallLimitWriter(LimitWriter(&buf, 0), 50)
+	_, err = w.Write([]byte("howdy"))
+	if err == nil {
+		t.Fatal("Write on CallLimitedWriter did not propagate underlying error")
+	}
+
+	// Write should properly decrement N.
+	limit := 50
+	buf.Reset()
+	lw := CallLimitedWriter{&buf, int64(limit)}
+	n, err = lw.Write([]byte("howdy"))
+	if err != nil {
+		t.Fatalf("Write on CallLimitedWriter unexpectedly errored: %s", err)
+	}
+	if lw.N != int64(limit-1) {
+		t.Fatalf("Write on CallLimitedWriter incorrectly updated N; got %d, expected %d", limit-1, lw.N)
+	}
+}
