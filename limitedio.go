@@ -1,3 +1,16 @@
+// Copyright 2024 Matt Schultz <schultz@sent.com>. All rights reserved.
+// Use of this source code is governed by an ISC license that can be found in the LICENSE file.
+
+/*
+Package limitedio provides wrappers for [io.Reader] and [io.Writer] that limit input and output
+by configurable parameters.
+
+A LimitedReader type is excluded from this package as one is already defined in the standard
+library [io] package. The implementations in this package are inspired heavily by
+[io.LimitedReader]. Call-limited wrappers target test cases where underlying readers and writers
+are inaccessible or not introspectable. None of the implementations in this package are inherently
+safe for concurrent use.
+*/
 package limitedio
 
 import "io"
