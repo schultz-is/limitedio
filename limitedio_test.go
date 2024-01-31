@@ -151,7 +151,7 @@ func TestCallLimitedWriter(t *testing.T) {
 	limit := 50
 	buf.Reset()
 	lw := CallLimitedWriter{&buf, int64(limit)}
-	n, err = lw.Write([]byte("howdy"))
+	_, err = lw.Write([]byte("howdy"))
 	if err != nil {
 		t.Fatalf("Write on CallLimitedWriter unexpectedly errored: %s", err)
 	}
